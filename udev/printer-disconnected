@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+import time
+import os
+import requests
+import sys
+
+logf = open('/var/tmp/printer-connected.log', 'a')
+
+DEVNAME = os.environ['DEVNAME']
+
+RESTART_STATES = [
+        'Offline',
+        'Cancelling',
+        'Operational',
+        ]
+
+OCTOPRINT_URL = 'http://localhost:5000/'
+API_KEY = 'XXX'
+
+def log(msg):
+    logf.write('%s\n' % (msg,))
+
+def currentstate():
+    headers = {'X-Api-Key': API_KEY}
+    url = OCTOPRINT_URL + '/api/job'
+    r = requests.get(url, headers=headers)
+    return r.json()['state']
+
+def main():
+    log(time.asctime())
+    log("Disconnecting: {}".format(DEVNAME))
+
+    state = currentstate()
+    if state not in RESTART_STATES and DEVNAME != '/dev/ttyUSB0':
+        log("Not restarting. State: {}  DEVNAME: {}".format(state, DEVNAME))
+        # Don't reset the firmware if not in a known safe state
+        return
+
+    headers = {'X-Api-Key': API_KEY}
+    json = {
+        "command": "FIRMWARE_RESTART",
+    }
+
+    url = OCTOPRINT_URL + '/api/printer/command'
+    r = requests.post(
+        url,
+        json=json,
+        headers=headers
+    )
+
+    if (r.status_code == 204):
+        log("Disconnected OK")
+        sys.exit(0)
+    else:
+        log("Error disconnecting: %s" % (r,))
+        sys.exit(1)
+
+if __name__ == '__main__':
+    main()
+

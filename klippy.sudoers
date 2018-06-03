@@ -1,0 +1,1 @@
+octoprint   ALL=(ALL:ALL) NOPASSWD: ALL

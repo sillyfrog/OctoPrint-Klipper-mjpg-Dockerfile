@@ -1,0 +1,20 @@
+#!/usr/bin/env python
+
+import time
+import os
+
+logf = open('/var/tmp/printer-connected.log', 'a')
+
+DEVNAME = os.environ['DEVNAME']
+
+def log(msg):
+    logf.write('%s\n' % (msg,))
+
+def main():
+    log(time.asctime())
+    log(DEVNAME)
+    os.system('chmod a+wr %s' % (DEVNAME,))
+
+if __name__ == '__main__':
+    main()
+

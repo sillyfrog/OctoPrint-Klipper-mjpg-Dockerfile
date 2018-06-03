@@ -1,0 +1,2 @@
+ACTION=="add", KERNEL=="ttyUSB*", SUBSYSTEM=="tty", RUN+="/somewhere/printer-connected"
+ACTION=="remove", KERNEL=="ttyUSB*", SUBSYSTEM=="tty", RUN+="/somewhere/printer-disconnected"
