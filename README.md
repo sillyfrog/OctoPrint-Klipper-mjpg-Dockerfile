@@ -47,4 +47,4 @@ docker run -d -v /etc/localtime:/etc/localtime:ro -v /home/user/Documents/octopr
     ko
 ```
 
-This is basically untested, but maybe a good start for someone who wants a simpler based container.
+This is basically untested, but maybe a good start for someone who wants a simpler base container.
