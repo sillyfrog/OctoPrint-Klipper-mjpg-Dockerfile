@@ -29,3 +29,22 @@ docker run --name octoprint2 -d -v /etc/localtime:/etc/localtime:ro -v /home/use
 Your Klipper `printer.cfg` should be kept in the OctoPrint config directory (this is where it looks for it at startup).
 
 If you have any questions, feel free to log an issue on this project, and I'll see if I can help.
+
+## No MJPG
+
+Also included is a cut down Dockerfile with no `mjpg` or OctoPrint plugins included.
+
+This can be built with:
+```
+docker build . --file Dockerfile.KlipperOctoprint -t ko
+```
+
+And run with something like:
+```
+docker run -d -v /etc/localtime:/etc/localtime:ro -v /home/user/Documents/octoprint-config:/home/octoprint/.octoprint \
+    --device /dev/ttyUSB0:/dev/ttyUSB0 \
+    -p 5000:5000 \
+    ko
+```
+
+This is basically untested, but maybe a good start for someone who wants a simpler based container.
