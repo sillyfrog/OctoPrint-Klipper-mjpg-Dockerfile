@@ -37,6 +37,10 @@ RUN cd /tmp \
     && mv -f ./build /opt/cura/ \
   && rm -Rf /tmp/*
 
+#Install Slic3r
+RUN cd /opt/ \
+  && curl https://dl.slic3r.org/dev/linux/Slic3r-master-latest.tar.bz2 | tar xj
+
 #Create an octoprint user
 RUN useradd -ms /bin/bash octoprint && adduser octoprint dialout
 RUN chown octoprint:octoprint /opt/octoprint
@@ -48,8 +52,7 @@ RUN mkdir /home/octoprint/.octoprint
 #Install Octoprint
 RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /opt/octoprint \
   && virtualenv venv \
-    && ./venv/bin/python setup.py install \
-    && echo 2
+    && ./venv/bin/python setup.py install
 
 RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/FormerLurker/Octolapse/archive/master.zip && \
 /opt/octoprint/venv/bin/python -m pip install https://github.com/pablogventura/Octoprint-ETA/archive/master.zip && \
@@ -57,12 +60,15 @@ RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/FormerLurke
 /opt/octoprint/venv/bin/python -m pip install https://github.com/dattas/OctoPrint-DetailedProgress/archive/master.zip && \
 /opt/octoprint/venv/bin/python -m pip install https://github.com/kennethjiang/OctoPrint-Slicer/archive/master.zip && \
 /opt/octoprint/venv/bin/python -m pip install https://github.com/marian42/octoprint-preheat/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/0.3.0.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/mikedmor/OctoPrint_MultiCam/archive/master.zip
+/opt/octoprint/venv/bin/python -m pip install https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/master.zip && \
+/opt/octoprint/venv/bin/python -m pip install https://github.com/mikedmor/OctoPrint_MultiCam/archive/master.zip && \
+/opt/octoprint/venv/bin/python -m pip install https://github.com/OctoPrint/OctoPrint-Slic3r/archive/master.zip
 
 # Installing from sillyfrog until the PR is merged to master
 RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/Octoslacka/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/OctoPrint-MQTT/archive/devel.zip
+/opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/OctoPrint-MQTT/archive/devel.zip && \
+/opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/OctoPrint-PrintHistory/archive/master.zip
+
 
 VOLUME /home/octoprint/.octoprint
 
