@@ -1,3 +1,5 @@
+# for more Dockerfile examples with Klipper see:
+# https://github.com/sillyfrog/OctoPrint-Klipper-mjpg-Dockerfile
 FROM python:2.7
 EXPOSE 8080
 
@@ -41,6 +43,8 @@ RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /opt/octopri
   && virtualenv venv \
     && ./venv/bin/python setup.py install \
     && echo 2
+
+RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/mmone/OctoPrintKlipper/archive/master.zip
 
 VOLUME /home/octoprint/.octoprint
 
