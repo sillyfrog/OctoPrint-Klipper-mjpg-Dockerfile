@@ -62,7 +62,8 @@ RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/FormerLurke
 /opt/octoprint/venv/bin/python -m pip install https://github.com/marian42/octoprint-preheat/archive/master.zip && \
 /opt/octoprint/venv/bin/python -m pip install https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/master.zip && \
 /opt/octoprint/venv/bin/python -m pip install https://github.com/mikedmor/OctoPrint_MultiCam/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/OctoPrint/OctoPrint-Slic3r/archive/master.zip
+/opt/octoprint/venv/bin/python -m pip install https://github.com/OctoPrint/OctoPrint-Slic3r/archive/master.zip && \
+/opt/octoprint/venv/bin/python -m pip install https://github.com/mmone/OctoPrintKlipper/archive/master.zip
 
 # Installing from sillyfrog until the PR is merged to master
 RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/Octoslacka/archive/master.zip && \
