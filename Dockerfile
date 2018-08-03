@@ -39,7 +39,10 @@ RUN cd /tmp \
 
 #Install Slic3r
 RUN cd /opt/ \
-  && curl https://dl.slic3r.org/dev/linux/Slic3r-master-latest.tar.bz2 | tar xj
+  && curl https://dl.slic3r.org/linux/slic3r-linux-x86-1-2-9-stable.tar.gz | tar xz
+
+# Dev builds have disappeared???
+  #&& curl https://dl.slic3r.org/dev/linux/Slic3r-master-latest.tar.bz2 | tar xj
 
 #Create an octoprint user
 RUN useradd -ms /bin/bash octoprint && adduser octoprint dialout
@@ -63,7 +66,8 @@ RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/FormerLurke
 /opt/octoprint/venv/bin/python -m pip install https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/master.zip && \
 /opt/octoprint/venv/bin/python -m pip install https://github.com/mikedmor/OctoPrint_MultiCam/archive/master.zip && \
 /opt/octoprint/venv/bin/python -m pip install https://github.com/OctoPrint/OctoPrint-Slic3r/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/mmone/OctoPrintKlipper/archive/master.zip
+/opt/octoprint/venv/bin/python -m pip install https://github.com/mmone/OctoPrintKlipper/archive/master.zip && \
+/opt/octoprint/venv/bin/python -m pip install https://github.com/jneilliii/OctoPrint-TabOrder/archive/master.zip
 
 # Installing from sillyfrog until the PR is merged to master
 RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/Octoslacka/archive/master.zip && \
