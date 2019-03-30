@@ -38,7 +38,7 @@ def main():
             mjpg_processes.append(subprocess.Popen(cmd))
 
     # Start klipper
-    klipper = subprocess.Popen(['sudo', '-u', 'octoprint', '/home/octoprint/klippy-env/bin/python', '/home/octoprint/klipper/klippy/klippy.py', '/home/octoprint/.octoprint/printer.cfg'])
+    klipper = subprocess.Popen(['sudo', '-u', 'octoprint', '/runklipper.py'])
 
     os.setgid(
         1000

@@ -22,7 +22,7 @@ WORKDIR /opt/octoprint
 
 #install ffmpeg
 RUN cd /tmp \
-  && wget -O ffmpeg.tar.xz https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-32bit-static.tar.xz \
+  && wget -O ffmpeg.tar.xz https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.0.3-32bit-static.tar.xz \
     && mkdir -p /opt/ffmpeg \
     && tar xvf ffmpeg.tar.xz -C /opt/ffmpeg --strip-components=1 \
   && rm -Rf /tmp/*
@@ -38,8 +38,9 @@ RUN cd /tmp \
   && rm -Rf /tmp/*
 
 #Install Slic3r
+COPY latestslic3r.py /opt/latestslic3r.py
 RUN cd /opt/ \
-  && curl https://dl.slic3r.org/linux/slic3r-linux-x86-1-2-9-stable.tar.gz | tar xz
+  && curl https://dl.slic3r.org/linux/$(/opt/latestslic3r.py) | tar xj
 
 # Dev builds have disappeared???
   #&& curl https://dl.slic3r.org/dev/linux/Slic3r-master-latest.tar.bz2 | tar xj
@@ -52,27 +53,31 @@ USER octoprint
 #This fixes issues with the volume command setting wrong permissions
 RUN mkdir /home/octoprint/.octoprint
 
+RUN echo v1.3.10
+
 #Install Octoprint
 RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /opt/octoprint \
   && virtualenv venv \
     && ./venv/bin/python setup.py install
 
-RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/FormerLurker/Octolapse/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/pablogventura/Octoprint-ETA/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/1r0b1n0/OctoPrint-Tempsgraph/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/dattas/OctoPrint-DetailedProgress/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/kennethjiang/OctoPrint-Slicer/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/marian42/octoprint-preheat/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/mikedmor/OctoPrint_MultiCam/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/OctoPrint/OctoPrint-Slic3r/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/mmone/OctoPrintKlipper/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/jneilliii/OctoPrint-TabOrder/archive/master.zip
+RUN /opt/octoprint/venv/bin/python -m pip install \
+https://github.com/FormerLurker/Octolapse/archive/master.zip \
+https://github.com/pablogventura/Octoprint-ETA/archive/master.zip \
+https://github.com/1r0b1n0/OctoPrint-Tempsgraph/archive/master.zip \
+https://github.com/dattas/OctoPrint-DetailedProgress/archive/master.zip \
+https://github.com/kennethjiang/OctoPrint-Slicer/archive/master.zip \
+https://github.com/marian42/octoprint-preheat/archive/master.zip \
+https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/master.zip \
+https://github.com/mikedmor/OctoPrint_MultiCam/archive/master.zip \
+https://github.com/OctoPrint/OctoPrint-Slic3r/archive/master.zip \
+https://github.com/mmone/OctoPrintKlipper/archive/master.zip \
+https://github.com/jneilliii/OctoPrint-TabOrder/archive/master.zip \
+https://github.com/OctoPrint/OctoPrint-MQTT/archive/master.zip \
+https://github.com/fraschetti/Octoslack/archive/master.zip \
+https://github.com/MoonshineSG/OctoPrint-MultiColors/archive/master.zip
 
 # Installing from sillyfrog until the PR is merged to master
-RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/Octoslacka/archive/master.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/OctoPrint-MQTT/archive/devel.zip && \
-/opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/OctoPrint-PrintHistory/archive/master.zip
+RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/OctoPrint-PrintHistory/archive/master.zip
 
 
 VOLUME /home/octoprint/.octoprint
@@ -101,5 +106,6 @@ RUN cp klipper/config/printer-anet-a8-2017.cfg /home/octoprint/printer.cfg
 USER root
 
 COPY start.py /
+COPY runklipper.py /
 
 CMD ["/start.py"]
