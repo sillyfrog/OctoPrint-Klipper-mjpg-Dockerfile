@@ -1,10 +1,10 @@
 # for more Dockerfile examples with Klipper see:
 # https://github.com/sillyfrog/OctoPrint-Klipper-mjpg-Dockerfile
-FROM python:2.7
+FROM ubuntu:18.04
 EXPOSE 8080
 
 RUN apt-get update && \
-    apt-get install -y sudo
+    apt-get install -y git python-virtualenv python-dev build-essential ffmpeg sudo
 
 EXPOSE 5000
 
@@ -12,23 +12,6 @@ ENV CURA_VERSION=15.04.6
 ARG tag=master
 
 WORKDIR /opt/octoprint
-
-#install ffmpeg
-RUN cd /tmp \
-  && wget -O ffmpeg.tar.xz https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.0.3-32bit-static.tar.xz \
-    && mkdir -p /opt/ffmpeg \
-    && tar xvf ffmpeg.tar.xz -C /opt/ffmpeg --strip-components=1 \
-  && rm -Rf /tmp/*
-
-#install Cura
-RUN cd /tmp \
-  && wget https://github.com/Ultimaker/CuraEngine/archive/${CURA_VERSION}.tar.gz \
-  && tar -zxf ${CURA_VERSION}.tar.gz \
-    && cd CuraEngine-${CURA_VERSION} \
-    && mkdir build \
-    && make \
-    && mv -f ./build /opt/cura/ \
-  && rm -Rf /tmp/*
 
 #Create an octoprint user
 RUN useradd -ms /bin/bash octoprint && adduser octoprint dialout
@@ -41,8 +24,7 @@ RUN mkdir /home/octoprint/.octoprint
 #Install Octoprint
 RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /opt/octoprint \
   && virtualenv venv \
-    && ./venv/bin/python setup.py install \
-    && echo 2
+    && ./venv/bin/python setup.py install
 
 RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/mmone/OctoPrintKlipper/archive/master.zip
 
@@ -52,13 +34,16 @@ VOLUME /home/octoprint/.octoprint
 ### Klipper setup ###
 
 USER root
+# This is to allow the install script to run without error
+RUN ln -s /bin/true /bin/systemctl
 COPY klippy.sudoers /etc/sudoers.d/klippy
 RUN useradd -ms /bin/bash klippy
 
 USER octoprint
 WORKDIR /home/octoprint
 RUN git clone https://github.com/KevinOConnor/klipper \
-    && ./klipper/scripts/install-octopi.sh
+    && ./klipper/scripts/install-ubuntu-18.04.sh \
+    && sudo rm -f /bin/systemctl
 
 COPY klippyoctostart.py /
 

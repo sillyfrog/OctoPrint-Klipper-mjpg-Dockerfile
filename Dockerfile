@@ -1,9 +1,9 @@
-
-FROM python:2.7
+FROM ubuntu:18.04
 EXPOSE 8080
 
 RUN apt-get update && \
-    apt-get install -y cmake libjpeg62-turbo-dev g++ wget unzip psmisc
+    apt-get install -y cmake libjpeg8-dev g++ wget curl unzip psmisc git \
+        python-virtualenv virtualenv python-dev libffi-dev build-essential ffmpeg
 
 RUN cd /tmp/ && \
     wget https://github.com/jacksonliam/mjpg-streamer/archive/master.zip && \
@@ -20,12 +20,8 @@ ARG tag=master
 
 WORKDIR /opt/octoprint
 
-#install ffmpeg
-RUN cd /tmp \
-  && wget -O ffmpeg.tar.xz https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.0.3-32bit-static.tar.xz \
-    && mkdir -p /opt/ffmpeg \
-    && tar xvf ffmpeg.tar.xz -C /opt/ffmpeg --strip-components=1 \
-  && rm -Rf /tmp/*
+# Cleanup
+RUN rm -Rf /tmp/*
 
 #install Cura
 RUN cd /tmp \
@@ -53,8 +49,6 @@ USER octoprint
 #This fixes issues with the volume command setting wrong permissions
 RUN mkdir /home/octoprint/.octoprint
 
-RUN echo v1.3.10
-
 #Install Octoprint
 RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /opt/octoprint \
   && virtualenv venv \
@@ -74,10 +68,10 @@ https://github.com/mmone/OctoPrintKlipper/archive/master.zip \
 https://github.com/jneilliii/OctoPrint-TabOrder/archive/master.zip \
 https://github.com/OctoPrint/OctoPrint-MQTT/archive/master.zip \
 https://github.com/fraschetti/Octoslack/archive/master.zip \
-https://github.com/MoonshineSG/OctoPrint-MultiColors/archive/master.zip
-
-# Installing from sillyfrog until the PR is merged to master
-RUN /opt/octoprint/venv/bin/python -m pip install https://github.com/sillyfrog/OctoPrint-PrintHistory/archive/master.zip
+https://github.com/MoonshineSG/OctoPrint-MultiColors/archive/master.zip \
+https://github.com/OctoPrint/OctoPrint-CuraLegacy/archive/master.zip \
+https://github.com/imrahil/OctoPrint-PrintHistory/archive/master.zip \
+https://github.com/Kragrathea/OctoPrint-PrettyGCode/archive/master.zip
 
 
 VOLUME /home/octoprint/.octoprint
@@ -93,17 +87,23 @@ COPY klippy.sudoers /etc/sudoers.d/klippy
 
 RUN useradd -ms /bin/bash klippy
 
+# This is to allow the install script to run without error
+RUN ln -s /bin/true /bin/systemctl
+
 USER octoprint
 
 WORKDIR /home/octoprint
 
 RUN git clone https://github.com/KevinOConnor/klipper
 
-RUN ./klipper/scripts/install-octopi.sh
+RUN ./klipper/scripts/install-ubuntu-18.04.sh
 
 RUN cp klipper/config/printer-anet-a8-2017.cfg /home/octoprint/printer.cfg
 
 USER root
+
+# Clean up hack for install script
+RUN rm -f /bin/systemctl
 
 COPY start.py /
 COPY runklipper.py /

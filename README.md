@@ -48,3 +48,18 @@ docker run -d -v /etc/localtime:/etc/localtime:ro -v /home/user/Documents/octopr
 ```
 
 This is basically untested, but maybe a good start for someone who wants a simpler base container.
+
+# Building the Klipper firmware
+
+To build the firmware for the 3D printer, enter the container, go to the klipper directory, run `make menuconfig`, then build, kill klipper, upload, restart. For example:
+```
+docker exec -ti octoprint2 bash
+cd /home/octoprint/klipper
+make menuconfig
+make
+pkill -f klippy; pkill -f klipper
+avrdude -p atmega1284p -c arduino -b 57600 -P /dev/ttyUSB0 -U out/klipper.elf.hex
+
+# Now exit and restart the container
+```
+
