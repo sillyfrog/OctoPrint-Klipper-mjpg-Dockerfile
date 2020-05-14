@@ -52,13 +52,13 @@ RUN mkdir /home/octoprint/.octoprint
 #Install Octoprint
 RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /opt/octoprint \
   && virtualenv venv \
-    && ./venv/bin/python setup.py install
+    && ./venv/bin/pip install .
 
 RUN /opt/octoprint/venv/bin/python -m pip install \
 https://github.com/FormerLurker/Octolapse/archive/master.zip \
 https://github.com/pablogventura/Octoprint-ETA/archive/master.zip \
 https://github.com/1r0b1n0/OctoPrint-Tempsgraph/archive/master.zip \
-https://github.com/dattas/OctoPrint-DetailedProgress/archive/master.zip \
+https://github.com/tpmullan/OctoPrint-DetailedProgress/archive/master.zip \
 https://github.com/kennethjiang/OctoPrint-Slicer/archive/master.zip \
 https://github.com/marian42/octoprint-preheat/archive/master.zip \
 https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/master.zip \
