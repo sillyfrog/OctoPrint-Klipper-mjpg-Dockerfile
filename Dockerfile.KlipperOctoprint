@@ -8,7 +8,6 @@ RUN apt-get update && \
 
 EXPOSE 5000
 
-ENV CURA_VERSION=15.04.6
 ARG tag=master
 
 WORKDIR /opt/octoprint

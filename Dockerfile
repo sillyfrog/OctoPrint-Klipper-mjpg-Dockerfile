@@ -1,9 +1,14 @@
-FROM ubuntu:18.04
+FROM ubuntu:20.04
 EXPOSE 8080
 
+
+# Override this for your location
+ENV TZ=Australia/Brisbane
+
+ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
-    apt-get install -y cmake libjpeg8-dev g++ wget curl unzip psmisc git \
-        python-virtualenv virtualenv python-dev libffi-dev build-essential ffmpeg
+    apt-get install -y cmake libjpeg8-dev g++ unzip wget git ffmpeg \
+        python2 virtualenv python3-dev
 
 RUN cd /tmp/ && \
     wget https://github.com/jacksonliam/mjpg-streamer/archive/master.zip && \
@@ -15,31 +20,12 @@ RUN cd /tmp/mjpg-streamer-master/mjpg-streamer-experimental/ && \
 
 EXPOSE 5000
 
-ENV CURA_VERSION=15.04.6
 ARG tag=master
 
 WORKDIR /opt/octoprint
 
 # Cleanup
 RUN rm -Rf /tmp/*
-
-#install Cura
-RUN cd /tmp \
-  && wget https://github.com/Ultimaker/CuraEngine/archive/${CURA_VERSION}.tar.gz \
-  && tar -zxf ${CURA_VERSION}.tar.gz \
-    && cd CuraEngine-${CURA_VERSION} \
-    && mkdir build \
-    && make \
-    && mv -f ./build /opt/cura/ \
-  && rm -Rf /tmp/*
-
-#Install Slic3r
-COPY latestslic3r.py /opt/latestslic3r.py
-RUN cd /opt/ \
-  && curl https://dl.slic3r.org/linux/$(/opt/latestslic3r.py) | tar xj
-
-# Dev builds have disappeared???
-  #&& curl https://dl.slic3r.org/dev/linux/Slic3r-master-latest.tar.bz2 | tar xj
 
 #Create an octoprint user
 RUN useradd -ms /bin/bash octoprint && adduser octoprint dialout
@@ -56,21 +42,17 @@ RUN git clone --branch $tag https://github.com/foosel/OctoPrint.git /opt/octopri
 
 RUN /opt/octoprint/venv/bin/python -m pip install \
 https://github.com/FormerLurker/Octolapse/archive/master.zip \
-https://github.com/pablogventura/Octoprint-ETA/archive/master.zip \
+https://github.com/AlexVerrico/Octoprint-Display-ETA/archive/master.zip \
 https://github.com/1r0b1n0/OctoPrint-Tempsgraph/archive/master.zip \
-https://github.com/tpmullan/OctoPrint-DetailedProgress/archive/master.zip \
-https://github.com/kennethjiang/OctoPrint-Slicer/archive/master.zip \
 https://github.com/marian42/octoprint-preheat/archive/master.zip \
 https://github.com/jneilliii/OctoPrint-TasmotaMQTT/archive/master.zip \
 https://github.com/mikedmor/OctoPrint_MultiCam/archive/master.zip \
-https://github.com/OctoPrint/OctoPrint-Slic3r/archive/master.zip \
-https://github.com/mmone/OctoPrintKlipper/archive/master.zip \
+https://github.com/AliceGrey/OctoprintKlipperPlugin/archive/master.zip \
 https://github.com/jneilliii/OctoPrint-TabOrder/archive/master.zip \
 https://github.com/OctoPrint/OctoPrint-MQTT/archive/master.zip \
 https://github.com/fraschetti/Octoslack/archive/master.zip \
 https://github.com/MoonshineSG/OctoPrint-MultiColors/archive/master.zip \
-https://github.com/OctoPrint/OctoPrint-CuraLegacy/archive/master.zip \
-https://github.com/imrahil/OctoPrint-PrintHistory/archive/master.zip \
+https://github.com/OllisGit/OctoPrint-PrintJobHistory/releases/latest/download/master.zip \
 https://github.com/Kragrathea/OctoPrint-PrettyGCode/archive/master.zip
 
 
@@ -95,6 +77,9 @@ USER octoprint
 WORKDIR /home/octoprint
 
 RUN git clone https://github.com/KevinOConnor/klipper
+
+# Update the install script for Ubuntu 20
+RUN sed -i 's/python-virtualenv //' ./klipper/scripts/install-ubuntu-18.04.sh
 
 RUN ./klipper/scripts/install-ubuntu-18.04.sh
 
