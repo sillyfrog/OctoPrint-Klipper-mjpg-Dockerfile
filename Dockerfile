@@ -8,7 +8,7 @@ ENV TZ=Australia/Brisbane
 ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y cmake libjpeg8-dev g++ unzip wget git ffmpeg \
-        python2 virtualenv python3-dev
+        python2 virtualenv python3-dev libffi-dev
 
 RUN cd /tmp/ && \
     wget https://github.com/jacksonliam/mjpg-streamer/archive/master.zip && \
